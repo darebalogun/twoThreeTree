@@ -2,57 +2,57 @@
  * Advanced implementation of a table using a 2-3 tree. Allows for insertion, traversal and deletion of integers into a set
  * Created by Oludare Balogun on 8/14/2017.
  */
-public class TestTwoThreeTree {
+public class TwoThreeTree <E, K extends Comparable<K>>{
 
     // Reference to root of 2-3 tree
-    private static TwoThreeNode root;
+    private TwoThreeNode<E,K> root;
 
     /**
      * Constructor creates a new 2-3 tree object
      */
-    public TestTwoThreeTree(){
+    public TwoThreeTree(){
         root = null;
     }
 
     /**
      * Insert into the 2-3 tree recursively
-     * @param data integer to be inserted into the set
+     * @param value integer to be inserted into the set
      * @param root reference to the recursive root of the 2-3 tree
      */
-    private static void recuInsert(int data, TwoThreeNode root) {
+    private void recuInsert(K key, E value, TwoThreeNode<E,K> root) {
         if (root.getRightData() != null) { // Current node is a 3-Node
-            if (data < root.getLeftData() && root.getLeftChild() != null) { // Check left child
-                recuInsert(data, root.getLeftChild());
-            } else if (data > root.getRightData() && root.getRightChild() != null) { // Check right child
-                recuInsert(data, root.getRightChild());
+            if (key.compareTo(root.getLeftData().getKey()) < 0 && root.getLeftChild() != null) { // Check left child
+                recuInsert(key, value, root.getLeftChild());
+            } else if (key.compareTo(root.getRightData().getKey()) > 0 && root.getRightChild() != null) { // Check right child
+                recuInsert(key, value, root.getRightChild());
             } else if (root.getMiddleChild() != null) { // Check middle child
-                recuInsert(data, root.getMiddleChild());
+                recuInsert(key, value, root.getMiddleChild());
             } else { // Must be at a leaf
-                split(data, root);
+                split(key, value, root);
             }
         } else { // Current Node is a 2 Node
-            if (data < root.getLeftData() && root.getLeftChild() != null) { //Check left child
-                recuInsert(data, root.getLeftChild());
+            if (key.compareTo(root.getLeftData().getKey()) < 0 && root.getLeftChild() != null) { //Check left child
+                recuInsert(key, value, root.getLeftChild());
             } else if (root.getMiddleChild() != null) { //Check middle child
-                recuInsert(data, root.getMiddleChild());
+                recuInsert(key, value, root.getMiddleChild());
             } else { // At a leaf
-                split(data, root);
+                split(key, value, root);
             }
         }
     }
 
     /**
      * Split function called by insertion function when node to be inserted into has been found
-     * @param data integer data to be inserted into the tree
+     * @param value integer value to be inserted into the tree
      * @param root reference to the current node being inserted into
      */
-    private static void split(int data, TwoThreeNode root){
+    private void split(K key, E value, TwoThreeNode<E,K> root){
         if (root.getRightData() == null) { // Insertion location is a 2-Node so just insert into node to make it 3-Node
-            if (data < root.getLeftData()){ // insert data into left value and bump other one to right
+            if (key.compareTo(root.getLeftData().getKey()) < 0){ // insert value into left value and bump other one to right
                 root.setRightData(root.getLeftData());
-                root.setLeftData(data);
-            } else { // insert data into right value
-                root.setRightData(data);
+                root.setLeftData(new KeyValuePair(key, value));
+            } else { // insert value into right value
+                root.setRightData(new KeyValuePair(key, value));
             }
             root.setRightChild(root.temp);
 
@@ -60,7 +60,7 @@ public class TestTwoThreeTree {
             TwoThreeNode smallLeft, smallRight, bigLeft, bigRight;
             smallLeft = root.getLeftChild();
 
-            if (root.temp != null && root.temp.getLeftData() > root.getMiddleChild().getLeftData()){  // Assign reference to the child nodes before splitting
+            if (root.temp != null && root.temp.getLeftData().getKey().compareTo(root.getMiddleChild().getLeftData().getKey()) > 0){  // Assign reference to the child nodes before splitting
                 smallRight = root.getMiddleChild();
                 bigLeft = root.getRightChild();
                 bigRight = root.temp;
@@ -71,26 +71,26 @@ public class TestTwoThreeTree {
             }
 
             // Split the 3-Node, promote the middle value and link the remaining 2 2-Node to their children
-            if (data < root.getLeftData()) {
-                root.setLeftChild(new TwoThreeNode(data,null,smallLeft,null,smallRight,root));
+            if (key.compareTo(root.getLeftData().getKey()) < 0) {
+                root.setLeftChild(new TwoThreeNode(value, key,null, null,smallLeft,null,smallRight,root));
                 if (smallLeft != null) { // Link children to their new parent's if not null
                     smallLeft.parent = root.getLeftChild();
                     smallRight.parent = root.getLeftChild();
                 }
-                root.setMiddleChild(new TwoThreeNode(root.getRightData(),null, bigLeft, null, bigRight,root));
+                root.setMiddleChild(new TwoThreeNode(root.getRightData(), root.getRightData().getKey(),null, null, bigLeft, null, bigRight,root));
                 if (bigLeft != null) { // Link children to their new parent's if not null
                     bigLeft.parent = root.getMiddleChild();
                     bigRight.parent = root.getMiddleChild();
                 }
                 root.setRightData(null);
                 root.setRightChild(null);
-            } else if (data > root.getRightData()){
-                root.setLeftChild(new TwoThreeNode(root.getLeftData(),null,smallLeft,null,smallRight,root));
+            } else if (key.compareTo(root.getRightData().getKey()) > 0){
+                root.setLeftChild(new TwoThreeNode(root.getLeftData().getValue(), root.getLeftData().getKey(),null, null,smallLeft,null,smallRight,root));
                 if (smallLeft != null) { // Link children to their new parent's if not null
                     smallLeft.parent = root.getLeftChild();
                     smallRight.parent = root.getLeftChild();
                 }
-                root.setMiddleChild(new TwoThreeNode(data,null, bigLeft, null, bigRight,root));
+                root.setMiddleChild(new TwoThreeNode(value, key, null,null, bigLeft, null, bigRight,root));
                 if (bigLeft != null) { // Link children to their new parent's if not null
                     bigLeft.parent = root.getMiddleChild();
                     bigRight.parent = root.getMiddleChild();
@@ -99,25 +99,25 @@ public class TestTwoThreeTree {
                 root.setRightData(null);
                 root.setRightChild(null);
             } else {
-                root.setLeftChild(new TwoThreeNode(root.getLeftData(),null,smallLeft,null,smallRight,root));
+                root.setLeftChild(new TwoThreeNode(root.getLeftData().getValue(), root.getLeftData().getKey(), null,null,smallLeft,null,smallRight,root));
                 if (smallLeft != null) {
                     smallLeft.parent = root.getLeftChild();
                     smallRight.parent = root.getLeftChild();
                 }
-                root.setMiddleChild(new TwoThreeNode(root.getRightData(),null, bigLeft, null, bigRight,root));
+                root.setMiddleChild(new TwoThreeNode(root.getRightData().getValue(), root.getRightData().getKey(), null,null, bigLeft, null, bigRight,root));
                 if (bigLeft != null) {
                     bigLeft.parent = root.getMiddleChild();
                     bigRight.parent = root.getMiddleChild();
                 }
-                root.setLeftData(data);
+                root.setLeftData(new KeyValuePair(key, value));
                 root.setRightData(null);
                 root.setRightChild(null);
             }
         } else { // Insertion node is a 3-Node that is not the root. Split the 3-Node into 2 two nodes and promote the middle value up to its parent.
-            Integer temp;
+           KeyValuePair temp;
             TwoThreeNode smallLeft, smallRight, bigLeft, bigRight;
             smallLeft = root.getLeftChild();
-            if (root.temp != null && root.temp.getLeftData() > root.getMiddleChild().getLeftData()){
+            if (root.temp != null && root.temp.getLeftData().getKey().compareTo(root.getMiddleChild().getLeftData().getKey()) > 0){
                 smallRight = root.getMiddleChild();
                 bigLeft = root.getRightChild();
                 bigRight = root.temp;
@@ -126,16 +126,16 @@ public class TestTwoThreeTree {
                 bigLeft = root.getMiddleChild();
                 bigRight = root.getRightChild();
             }
-            if (data < root.getLeftData()) { // Split and promote left child
+            if (key.compareTo(root.getLeftData().getKey()) < 0) { // Split and promote left child
                 temp = root.getLeftData();
-                root.setLeftData(data);
-            } else if (data > root.getRightData()) {
+                root.setLeftData(new KeyValuePair(key, value));
+            } else if (key.compareTo(root.getRightData().getKey()) > 0) {
                 temp = root.getRightData();
-                root.setRightData(data);
+                root.setRightData(new KeyValuePair(key, value));
             } else {
-                temp = data;
+                temp = new KeyValuePair(key, value);
             }
-            root.getParent().temp = new TwoThreeNode(root.getRightData(), null, bigLeft, null, bigRight, root.getParent());
+            root.getParent().temp = new TwoThreeNode(root.getRightData().getValue(), root.getRightData().getKey(), null, null, bigLeft, null, bigRight, root.getParent());
             root.setRightData(null);
             root.setRightChild(null);
             // Assign new nodes to their children
@@ -148,54 +148,54 @@ public class TestTwoThreeTree {
                 bigLeft.parent = root.getParent().temp;
                 bigRight.parent = root.getParent().temp;
             }
-            split(temp, root.getParent());
+            split((K) temp.getKey(), (E) temp.getValue(), root.getParent());
         }
     }
 
     /**
      * Insert into 2-3 tree
-     * @param data int to be inserted into the tree
+     * @param value int to be inserted into the tree
      */
-    public static void insert(int data){
+    public void insert(K key, E value){
         if (root == null){
-            root = new TwoThreeNode(data,null,null,null,null,null);
+            root = new TwoThreeNode(value, key, null,null,null,null,null, null);
         } else {
-            recuInsert(data, root);
+            recuInsert(key, value, root);
         }
     }
 
     /**
      * Recursively delete values from the tree by swapping with in order successor and then merge or redistribute
-     * @param data data to be deleted from the tree
+     * @param key key of value to be deleted from the tree
      * @param root root of the tree or subtree
      */
-    private static void recuDelete(int data, TwoThreeNode root){
+    private void recuDelete(K key, TwoThreeNode<E,K> root){
         if (root == null){ // Not found or tree is empty
             return;
         }
         if (root.getRightData() == null) { //Node being checked is 2-Node
-            if (data < root.getLeftData()) { //Check left subtree
-                recuDelete(data,root.getLeftChild());
-            } else if (data > root.getLeftData()) { // Check middle subtree
-                recuDelete(data, root.getMiddleChild());
-            } else { //Node contains data to be deleted
+            if (key.compareTo(root.getLeftData().getKey()) < 0) { //Check left subtree
+                recuDelete(key,root.getLeftChild());
+            } else if (key.compareTo(root.getLeftData().getKey()) > 0) { // Check middle subtree
+                recuDelete(key, root.getMiddleChild());
+            } else { //Node contains value to be deleted
                 if (root.getMiddleChild() != null){ // Node has children swap node with in order successor
                     root.setLeftData(minValue(root.getMiddleChild()).getLeftData());
-                    recuDelete(root.getLeftData(),root.getMiddleChild());
+                    recuDelete((K) root.getLeftData().getKey(),root.getMiddleChild());
                 } else { // node is a leaf
-                    if (root.getLeftData() != data){
+                    if (root.getLeftData().getKey().compareTo(key) != 0){
                         return;
                     }
                     if (root.getParent().getRightData() != null){ // Root is child of a 3 node
                         if (root == root.getParent().getMiddleChild()) { // root is middle child of 3 node
-                            Integer temp = root.getParent().getLeftData();
+                            KeyValuePair temp = root.getParent().getLeftData();
                             root.getParent().setLeftData(root.getParent().getRightData());
                             root.getParent().setRightData(null);
                             root.getParent().setMiddleChild(root.getRightChild());
                             root.getParent().setRightChild(null);
                             root.getParent().getLeftChild().setRightData(temp);
                         } else if (root == root.getParent().getLeftChild()){ // root is left child of 3 node
-                            Integer temp = root.getParent().getLeftData();
+                            KeyValuePair temp = root.getParent().getLeftData();
                             root.getParent().setLeftData(root.getParent().getRightData());
                             root.getParent().setRightData(null);
                             root.getParent().setLeftChild(root.getParent().getMiddleChild());
@@ -204,7 +204,7 @@ public class TestTwoThreeTree {
                             root.getParent().getLeftChild().setRightData(root.getParent().getLeftChild().getLeftData());
                             root.getParent().getLeftChild().setLeftData(temp);
                         } else { // root is right child of 3 node
-                            Integer temp = root.getParent().getRightData();
+                            KeyValuePair temp = root.getParent().getRightData();
                             root.getParent().setRightData(null);
                             root.getParent().setRightChild(null);
                             root.getParent().getMiddleChild().setRightData(temp);
@@ -213,7 +213,7 @@ public class TestTwoThreeTree {
                     } else { // root is child of 2 node
                         if (root.getParent().getMiddleChild() == root){ // root is right child of 2 node
                             if (root.getParent().getLeftChild().getRightData() != null) { // Root's sibling on the left is a 3 node
-                                Integer temp = root.getParent().getLeftData();
+                                KeyValuePair temp = root.getParent().getLeftData();
                                 root.getParent().setLeftData(root.getParent().getLeftChild().getRightData());
                                 root.getParent().getLeftChild().setRightData(null);
                                 root.setLeftData(temp);
@@ -224,7 +224,7 @@ public class TestTwoThreeTree {
                             }
                         } else { // Root is left child of 2 Node
                             if (root.getParent().getLeftChild().getRightData() != null) { // Root's sibling on the right is a 3 node
-                                Integer temp = root.getParent().getLeftData();
+                                KeyValuePair temp = root.getParent().getLeftData();
                                 root.getParent().setLeftData(root.getParent().getRightChild().getLeftData());
                                 root.getParent().getRightChild().setLeftData(root.getParent().getRightChild().getRightData());
                                 root.getParent().getRightChild().setRightData(null);
@@ -239,24 +239,24 @@ public class TestTwoThreeTree {
                 }
             }
         } else { // Node being checked is 3-Node (easy case)
-            if (data < root.getLeftData()) { // Check left subtree
-                recuDelete(data,root.getLeftChild());
-            } else if (data > root.getRightData()) { // Check right subtree
-                recuDelete(data, root.getRightChild());
-            } else if (data > root.getLeftData() && data < root.getRightData()){ //Check middle subtree
-                recuDelete(data, root.getMiddleChild());
-            } else { // Node contains data to be deleted
-                if (root.getLeftData() != data || root.getRightData() != data){ // Not found, return
+            if (key.compareTo(root.getLeftData().getKey()) < 0) { // Check left subtree
+                recuDelete(key,root.getLeftChild());
+            } else if (key.compareTo(root.getRightData().getKey()) > 0) { // Check right subtree
+                recuDelete(key, root.getRightChild());
+            } else if (key.compareTo(root.getLeftData().getKey()) > 0 && key.compareTo(root.getRightData().getKey()) < 0){ //Check middle subtree
+                recuDelete(key, root.getMiddleChild());
+            } else { // Node contains value to be deleted
+                if (root.getLeftData().getKey().compareTo(key) != 0 || root.getRightData().getKey().compareTo(key) != 0){ // Not found, return
                     return;
                 }
-                if (data == root.getLeftData() && root.getMiddleChild() != null){ //Data is smaller value in node and node has children
+                if (key.compareTo(root.getLeftData().getKey()) == 0  && root.getMiddleChild() != null){ //value is smaller value in node and node has children
                     root.setLeftData(minValue(root.getMiddleChild()).getLeftData());
-                    recuDelete(root.getLeftData(),root.getMiddleChild());
-                } else if (data == root.getRightData() && root.getRightChild() != null) { // Data is larger value in node and node has children
+                    recuDelete((K) root.getLeftData().getKey(),root.getMiddleChild());
+                } else if (key.compareTo(root.getRightData().getKey()) == 0 && root.getRightChild() != null) { // value is larger value in node and node has children
                     root.setRightData(minValue(root.getRightChild()).getLeftData());
-                    recuDelete(root.getRightData(),root.getRightChild());
+                    recuDelete((K) root.getRightData().getKey(),root.getRightChild());
                 } else { // node is a leaf
-                    if (root.getLeftData() == data){ //Delete smaller value
+                    if (root.getLeftData().getKey().compareTo(key) == 0){ //Delete smaller value
                         root.setLeftData(root.getRightData());
                         root.setRightData(null);
                     } else { // Delete larger value
@@ -272,7 +272,7 @@ public class TestTwoThreeTree {
      * @param root parent of node to be deleted
      * @param child reference to merged leaf node
      */
-    private static void merge(TwoThreeNode root, TwoThreeNode child){
+    private void merge(TwoThreeNode root, TwoThreeNode child){
             if (root.getMiddleChild().getLeftData() == null){ // merging on the right
                 if (root.getLeftChild().getRightData() == null) { // 2 node on left side of root
                     if (root.getParent().getLeftChild() == root) {
@@ -285,12 +285,12 @@ public class TestTwoThreeTree {
                     root.getLeftChild().setRightData(root.getLeftData());
                     root.setRightChild(child);
                 } else { // 3 node on left side of root
-                    Integer temp = child.getLeftData();
+                    KeyValuePair temp = child.getLeftData();
                     root.getMiddleChild().setLeftData(temp);
                     root.getMiddleChild().getMiddleChild().setLeftData(child.getRightData());
                     child.setRightData(null);
                     root.setLeftData(maxValue(root.getLeftChild()).getLeftData());
-                    recuDelete(root.getLeftData(),root.getLeftChild());
+                    recuDelete((K) root.getLeftData().getKey(),root.getLeftChild());
                 }
             } else if (root.getLeftChild().getLeftData() == null){ //merging on the left
                 if (root.getMiddleChild().getRightData() == null) { // 2 node on the right side of root
@@ -306,12 +306,12 @@ public class TestTwoThreeTree {
                     root.getMiddleChild().setLeftData(root.getLeftData());
                     root.getMiddleChild().setLeftChild(child);
                 } else { // 3 node on the right side of root
-                    Integer temp = child.getRightData();
+                    KeyValuePair temp = child.getRightData();
                     root.getLeftChild().setLeftData(temp);
                     child.setRightData(null);
                     root.getLeftChild().getMiddleChild().setLeftData(root.getLeftData());
                     root.setLeftData(minValue(root.getMiddleChild()).getLeftData());
-                    recuDelete(root.getLeftData(),root.getMiddleChild());
+                    recuDelete((K) root.getLeftData().getKey(),root.getMiddleChild());
                 }
            }
     }
@@ -346,13 +346,13 @@ public class TestTwoThreeTree {
 
     /**
      * Deletes value specified from the set
-     * @param data data to be deleted from the set
+     * @param key key of value to be deleted from the set
      */
-    public static void delete(int data){
+    public void delete(K key){
         if (root == null){ // Do nothing, empty tree
             return;
         } else {
-            recuDelete(data, root);
+            recuDelete(key, root);
         }
     }
 
@@ -362,19 +362,19 @@ public class TestTwoThreeTree {
      */
     public static void recuPrint(TwoThreeNode root){
         if (root.getLeftChild() == null){
-            System.out.println(root.getLeftData());
+            System.out.println(root.getLeftData().getValue());
             if (root.getRightData() != null){
-                System.out.println(root.getRightData());
+                System.out.println(root.getRightData().getValue());
             }
         } else if (root.getRightChild() != null){
             recuPrint(root.getLeftChild());
-            System.out.println(root.leftData);
+            System.out.println(root.getLeftData().getValue());
             recuPrint(root.getMiddleChild());
-            System.out.println(root.rightData);
+            System.out.println(root.getRightData().getValue());
             recuPrint(root.getRightChild());
         } else {
             recuPrint(root.getLeftChild());
-            System.out.println(root.getLeftData());
+            System.out.println(root.getLeftData().getValue());
             recuPrint(root.getMiddleChild());
         }
     }
@@ -382,28 +382,28 @@ public class TestTwoThreeTree {
     /**
      * Prints contents of the set
      */
-    public static void printTree(){
+    public void printTree(){
         System.out.println();
         recuPrint(root);
     }
 
     public static void main(String[] args) {
-        new TestTwoThreeTree();
+        TwoThreeTree tree = new TwoThreeTree();
 
         // Add 1 to 10 to the set
         for (int i = 0; i < 10; i++) {
-            insert(i + 1);
+            tree.insert(new Integer(i + 1), new Integer(i + 1));
         }
 
         //Delete 3 then print
-        delete(3);
-        printTree();
+       // tree.delete(3);
+        tree.printTree();
 
         // Delete 7 then print
-        delete(7);
-        printTree();
+        //tree.delete(7);
+        //tree.printTree();
 
         //Delete 13?
-        delete(13);
+       // tree.delete(13);
     }
 }

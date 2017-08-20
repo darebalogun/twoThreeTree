@@ -1,55 +1,59 @@
 /**
  * Node class for a 2-3 tree
- * Created by Alienware on 8/14/2017.
+ * Created by Oludare balogun on 8/14/2017.
  */
-public class TwoThreeNode {
+public class TwoThreeNode<E, K extends Comparable<K>> {
 
-        protected Integer leftData;
+        protected KeyValuePair<E,K> leftData;
 
-        protected Integer rightData;
+        protected KeyValuePair<E,K> rightData;
 
-        protected TwoThreeNode left, right, middle, parent, temp;
+        protected TwoThreeNode<E,K> left, right, middle, parent, temp;
 
-        public TwoThreeNode(Integer leftData, Integer rightData, TwoThreeNode left, TwoThreeNode right, TwoThreeNode middle, TwoThreeNode parent) {
-            this.leftData = leftData;
-            this.rightData = rightData;
+        public TwoThreeNode(E leftData, K leftKey, E rightData, K rightKey, TwoThreeNode left, TwoThreeNode right, TwoThreeNode middle, TwoThreeNode parent) {
+            this.leftData = new KeyValuePair(leftKey, leftData);
+            if (rightData == null){
+                this.rightData = null;
+            } else {
+                this.rightData = new KeyValuePair(rightKey, rightData);
+            }
             this.left = left;
             this.right = right;
             this.middle = middle;
             this.parent = parent;
-
+            this.temp = null;
         } // TwoThreeNode constructor
 
-        public Integer getLeftData() {
+        public KeyValuePair<E,K> getLeftData() {
             return leftData;
         } // getLeftData method
 
-        public Integer getRightData() {
+        public KeyValuePair<E,K> getRightData() {
             return rightData;
         } // getRightData method
 
-        public TwoThreeNode getLeftChild() {
+        public TwoThreeNode<E,K> getLeftChild() {
             return left;
         } // getLeft method
 
-        public TwoThreeNode getRightChild() {
+        public TwoThreeNode<E,K> getRightChild() {
             return right;
         } // getRight method
 
-         public TwoThreeNode getMiddleChild() {
+        public TwoThreeNode<E,K> getMiddleChild() {
              return middle;
           } // getMiddle method
 
-        public TwoThreeNode getParent(){
+        public TwoThreeNode<E,K> getParent(){
             return parent;
-        }
+        } // getParet
 
-        public void setLeftData(Integer data) {
-            this.leftData = data;
+        public void setLeftData(KeyValuePair value) {
+            this.leftData = value;
         } // setLeft method
 
-        public void setRightData(Integer data) {
-            this.rightData = data;
+        public void setRightData(KeyValuePair value) {
+            this.rightData = value;
          } // setRight method
 
         public void setLeftChild(TwoThreeNode node) {
