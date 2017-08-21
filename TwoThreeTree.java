@@ -191,7 +191,7 @@ public class TwoThreeTree <E, K extends Comparable<K>>{
                             KeyValuePair temp = root.getParent().getLeftData();
                             root.getParent().setLeftData(root.getParent().getRightData());
                             root.getParent().setRightData(null);
-                            root.getParent().setMiddleChild(root.getRightChild());
+                            root.getParent().setMiddleChild(root.getParent().getRightChild());
                             root.getParent().setRightChild(null);
                             root.getParent().getLeftChild().setRightData(temp);
                         } else if (root == root.getParent().getLeftChild()){ // root is left child of 3 node
@@ -230,9 +230,10 @@ public class TwoThreeTree <E, K extends Comparable<K>>{
                                 root.getParent().getRightChild().setRightData(null);
                                 root.setLeftData(temp);
                             } else { // Root's sibling on the right is a 2 node
-                                root.getParent().getRightChild().setRightData(root.getParent().getLeftData());
+                                root.getParent().getMiddleChild().setRightData(root.getParent().getMiddleChild().getLeftData());
+                                root.getParent().getMiddleChild().setLeftData(root.getParent().getLeftData());
                                 root.getParent().setLeftData(null);
-                                merge(root.getParent().getParent(),root.getParent().getRightChild());
+                                merge(root.getParent().getParent(),root.getParent().getMiddleChild());
                             }
                         }
                     }
@@ -246,7 +247,7 @@ public class TwoThreeTree <E, K extends Comparable<K>>{
             } else if (key.compareTo(root.getLeftData().getKey()) > 0 && key.compareTo(root.getRightData().getKey()) < 0){ //Check middle subtree
                 recuDelete(key, root.getMiddleChild());
             } else { // Node contains value to be deleted
-                if (root.getLeftData().getKey().compareTo(key) != 0 || root.getRightData().getKey().compareTo(key) != 0){ // Not found, return
+                if (root.getLeftData().getKey().compareTo(key) != 0 && root.getRightData().getKey().compareTo(key) != 0){ // Not found, return
                     return;
                 }
                 if (key.compareTo(root.getLeftData().getKey()) == 0  && root.getMiddleChild() != null){ //value is smaller value in node and node has children
@@ -308,6 +309,7 @@ public class TwoThreeTree <E, K extends Comparable<K>>{
                 } else { // 3 node on the right side of root
                     KeyValuePair temp = child.getRightData();
                     root.getLeftChild().setLeftData(temp);
+                    root.getLeftChild().getLeftChild().setLeftData(child.getLeftData());
                     child.setRightData(null);
                     root.getLeftChild().getMiddleChild().setLeftData(root.getLeftData());
                     root.setLeftData(minValue(root.getMiddleChild()).getLeftData());
@@ -395,15 +397,11 @@ public class TwoThreeTree <E, K extends Comparable<K>>{
             tree.insert(new Integer(i + 1), new Integer(i + 1));
         }
 
-        //Delete 3 then print
-       // tree.delete(3);
         tree.printTree();
 
         // Delete 7 then print
-        //tree.delete(7);
-        //tree.printTree();
+        tree.delete(10);
+        tree.printTree();
 
-        //Delete 13?
-       // tree.delete(13);
     }
 }
